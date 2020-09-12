@@ -56,7 +56,7 @@ function create_chart(data) {
 	};
 
 	let opts = {
-		title: "Phoenix Performance",
+		title: "Web Request Response Time [ms]",
 		id: "chart1",
 		class: "my-chart",
 		width: rect.width,
