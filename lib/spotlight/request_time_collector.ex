@@ -18,10 +18,13 @@ defmodule Spotlight.RequestTimeCollector do
   end
 
   def handle_metrics([:phoenix, :endpoint, :stop], %{duration: duration}, _metadata, _config) do
-    send(__MODULE__, {:duration, duration, System.monotonic_time(:second)})
+    send(
+      __MODULE__,
+      {:duration, duration, System.monotonic_time(:second), System.time_offset(:second)}
+    )
   end
 
-  def handle_info({:duration, duration, mono_time}, state) do
+  def handle_info({:duration, duration, mono_time, time_offset}, state) do
     converted_duration_us = System.convert_time_unit(duration, :native, :microsecond)
 
     new_state =
@@ -46,7 +49,7 @@ defmodule Spotlight.RequestTimeCollector do
               Map.put(
                 state.value_map,
                 mono_time,
-                {sdog, mono_time + System.time_offset(:second)}
+                {sdog, mono_time + time_offset}
               )
           }
 
