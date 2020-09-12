@@ -18,7 +18,7 @@ defmodule SpotlightWeb.PageLive do
   end
 
   defp formatted_time_series() do
-    data = Spotlight.RequestTimeCollector.get_merged() |> IO.inspect()
+    data = Spotlight.RequestTimeCollector.get_merged()
 
     [
       Enum.map(data, fn {ts, _} -> ts end),
