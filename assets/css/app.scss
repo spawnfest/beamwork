@@ -2,6 +2,7 @@
 @import "./phoenix.css";
 @import "../node_modules/nprogress/nprogress.css";
 @import "../node_modules/uplot/dist/uPlot.min.css";
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&display=swap');
 
 /* LiveView specific classes for your customizations */
 .phx-no-feedback.invalid-feedback,
@@ -89,4 +90,19 @@
   color: #a94442;
   display: block;
   margin: -1rem 0 2rem;
+}
+
+// OUR STYLES
+body {
+  font-family: 'Lato', 'Helvetica', 'Arial'
+}
+
+header {
+  background: #007AA1;
+  border-bottom: 1px solid #007AA1;
+  padding: 1em 0em
+}
+
+#logo {
+  height: 80px
 }
