@@ -1,5 +1,5 @@
-
-<div class="test_graph" data-quantile="<%= Jason.encode!(@quantile_data) %>" phx-hook="ChartData"></div>
-<div style="height: 100vh; width: 100vh" id="chart_parent">
-  <div id="chart"></div>
+<div class="chart_container">
+  <div class="chart_parent" id="chart_parent">
+    <div id="chart" class="chart" data-quantile="<%= Jason.encode!(@quantile_data) %>" phx-hook="ChartData" phx-update="ignore"></div>
+  </div>
 </div>

@@ -24,6 +24,9 @@ defmodule Spotlight.RequestTimeCollector do
     )
   end
 
+  @seconds_to_keep 500
+  @max_error 0.04
+
   def handle_info({:duration, duration, mono_time, time_offset}, state) do
     converted_duration_us = System.convert_time_unit(duration, :native, :microsecond)
 
@@ -40,7 +43,7 @@ defmodule Spotlight.RequestTimeCollector do
 
         keys ->
           sdog =
-            SimpleDog.new(error: 0.04)
+            SimpleDog.new(error: @max_error)
             |> SimpleDog.insert(converted_duration_us)
 
           new_state = %{
@@ -53,7 +56,14 @@ defmodule Spotlight.RequestTimeCollector do
               )
           }
 
-          new_state = Map.put(new_state, :keys, Enum.take(new_state.keys, 50))
+          new_keys =
+            new_state.keys
+            |> Enum.filter(fn
+              key when key > mono_time - @seconds_to_keep -> true
+              _ -> false
+            end)
+
+          new_state = Map.put(new_state, :keys, new_keys)
           Map.put(new_state, :value_map, Map.take(new_state.value_map, new_state.keys))
       end
 
@@ -81,6 +91,5 @@ defmodule Spotlight.RequestTimeCollector do
         SimpleDog.merge(s1, s2)
       end)
     end)
-    |> Enum.sort_by(fn {key, _} -> key end)
   end
 end

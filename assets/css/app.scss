@@ -91,10 +91,11 @@
   display: block;
   margin: -1rem 0 2rem;
 }
-
 // OUR STYLES
 body {
-  font-family: 'Lato', 'Helvetica', 'Arial'
+  font-family: 'Lato', 'Helvetica', 'Arial';
+  margin: 0;
+  background: #e1dfe8;
 }
 
 header {
@@ -103,6 +104,26 @@ header {
   padding: 1em 0em
 }
 
+.container {
+  //min-width: 60vw;
+  max-width: 60vw;
+}
+
 #logo {
   height: 80px
+}
+
+.chart_container {
+  display: inline-block;
+  padding: 20px;
+  background-color: white;
+  border-radius: 20px;
+  //height: 20vw;
+  box-shadow: 5px 5px 10px 0px rgba(152,141,161,0.15);
+}
+
+.chart_parent {
+  //height: 100%;
+  //height: 20vw;
+  //width: 80vw;
 }

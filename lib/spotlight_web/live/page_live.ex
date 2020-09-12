@@ -19,17 +19,26 @@ defmodule SpotlightWeb.PageLive do
 
   defp formatted_time_series() do
     data = Spotlight.RequestTimeCollector.get_merged()
+    keys = Enum.map(data, fn {ts, _} -> ts end)
+    min_ts = Enum.min(keys, fn -> 0 end)
+    max_ts = Enum.max(keys, fn -> 0 end)
+
+    keys = Enum.map(min_ts..max_ts, fn x -> x end)
 
     [
-      Enum.map(data, fn {ts, _} -> ts end),
-      Enum.map(data, fn {_ts, dog_sketch} -> SimpleDog.quantile(dog_sketch, 0.5) |> ceil() end),
-      Enum.map(data, fn {_ts, dog_sketch} -> SimpleDog.quantile(dog_sketch, 0.95) |> ceil() end),
-      Enum.map(data, fn {_ts, dog_sketch} -> SimpleDog.quantile(dog_sketch, 0.99) |> ceil() end)
+      keys,
+      Enum.map(keys, fn ts ->
+        val = Map.get(data, ts, SimpleDog.new()) |> SimpleDog.quantile(0.99) |> ceil()
+        val / 1000
+      end),
+      Enum.map(keys, fn ts ->
+        val = Map.get(data, ts, SimpleDog.new()) |> SimpleDog.quantile(0.90) |> ceil()
+        val / 1000
+      end),
+      Enum.map(keys, fn ts ->
+        val = Map.get(data, ts, SimpleDog.new()) |> SimpleDog.quantile(0.50) |> ceil()
+        val / 1000
+      end)
     ]
   end
-
-  # @impl true
-  # def handle_event("suggest", %{"q" => query}, socket) do
-  #  {:noreply, assign(socket, results: search(query), query: query)}
-  # end
 end
