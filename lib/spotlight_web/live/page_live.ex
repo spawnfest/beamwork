@@ -1,39 +1,35 @@
 defmodule SpotlightWeb.PageLive do
   use SpotlightWeb, :live_view
+  alias DogSketch.SimpleDog
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, query: "", results: %{})}
+    schedule_tick()
+    {:ok, assign(socket, quantile_data: formatted_time_series())}
   end
 
-  @impl true
-  def handle_event("suggest", %{"q" => query}, socket) do
-    {:noreply, assign(socket, results: search(query), query: query)}
+  def handle_info(:tick, socket) do
+    schedule_tick()
+    {:noreply, assign(socket, :quantile_data, formatted_time_series())}
   end
 
-  @impl true
-  def handle_event("search", %{"q" => query}, socket) do
-    case search(query) do
-      %{^query => vsn} ->
-        {:noreply, redirect(socket, external: "https://hexdocs.pm/#{query}/#{vsn}")}
-
-      _ ->
-        {:noreply,
-         socket
-         |> put_flash(:error, "No dependencies found matching \"#{query}\"")
-         |> assign(results: %{}, query: query)}
-    end
+  defp schedule_tick() do
+    Process.send_after(self(), :tick, 1000)
   end
 
-  defp search(query) do
-    if not SpotlightWeb.Endpoint.config(:code_reloader) do
-      raise "action disabled when not in development"
-    end
+  defp formatted_time_series() do
+    data = Spotlight.RequestTimeCollector.get_merged() |> IO.inspect()
 
-    for {app, desc, vsn} <- Application.started_applications(),
-        app = to_string(app),
-        String.starts_with?(app, query) and not List.starts_with?(desc, ~c"ERTS"),
-        into: %{},
-        do: {app, vsn}
+    [
+      Enum.map(data, fn {ts, _} -> ts end),
+      Enum.map(data, fn {_ts, dog_sketch} -> SimpleDog.quantile(dog_sketch, 0.5) |> ceil() end),
+      Enum.map(data, fn {_ts, dog_sketch} -> SimpleDog.quantile(dog_sketch, 0.95) |> ceil() end),
+      Enum.map(data, fn {_ts, dog_sketch} -> SimpleDog.quantile(dog_sketch, 0.99) |> ceil() end)
+    ]
   end
+
+  # @impl true
+  # def handle_event("suggest", %{"q" => query}, socket) do
+  #  {:noreply, assign(socket, results: search(query), query: query)}
+  # end
 end

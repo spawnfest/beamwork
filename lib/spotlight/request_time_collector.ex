@@ -63,4 +63,24 @@ defmodule Spotlight.RequestTimeCollector do
   def handle_call(:get_all, _from, state) do
     {:reply, Map.new(state.value_map, fn {_time, {sdog, time}} -> {time, sdog} end), state}
   end
+
+  def get_all do
+    GenServer.call(__MODULE__, :get_all)
+  end
+
+  def get_merged() do
+    {results, _bad_nodes} = :rpc.multicall(__MODULE__, :get_all, [])
+
+    Enum.map(results, fn
+      {:badrpc, _reason} -> nil
+      result -> result
+    end)
+    |> Enum.filter(fn x -> x end)
+    |> Enum.reduce(%{}, fn result, acc ->
+      Map.merge(acc, result, fn _key, s1, s2 ->
+        SimpleDog.merge(s1, s2)
+      end)
+    end)
+    |> Enum.sort_by(fn {key, _} -> key end)
+  end
 end
