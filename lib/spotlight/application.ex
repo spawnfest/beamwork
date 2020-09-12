@@ -12,7 +12,8 @@ defmodule Spotlight.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Spotlight.PubSub},
       # Start the Endpoint (http/https)
-      SpotlightWeb.Endpoint
+      SpotlightWeb.Endpoint,
+      Spotlight.RequestTimeCollector
       # Start a worker by calling: Spotlight.Worker.start_link(arg)
       # {Spotlight.Worker, arg}
     ]
