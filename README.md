@@ -1,12 +1,6 @@
 ![Spotlight Logo](img/logo.png)
 
-## Linear Scale
-![Spotlight linear scale](img/linearscale.png)
-
-## Log Scale
-![Spotlight log scale](img/logscale2.png)
-
-# Phoenix Web Response Time Graphs
+# Phoenix Response Time Graphs
 
 :heavy_check_mark: Very very low overhead (powered by [DogSketch](https://github.com/moosecodebv/dog_sketch))
 
@@ -17,6 +11,16 @@
 :heavy_check_mark: Accurate p50, p90, p99 and throughput
 
 :heavy_check_mark: Linear and Log scale
+
+## Linear Scale
+![Spotlight linear scale](img/linearscale.png)
+
+## Log Scale
+![Spotlight log scale](img/logscale2.png)
+
+# Caveat
+
+To our knowledge nobody is running this in production yet. BUT, in theory, it should be able to track an obscene number of requests without slowing down your system. I suspect it will handle at least 100k requests per second per node with ease. Give it a try and let us know!
 
 # Installation
 
