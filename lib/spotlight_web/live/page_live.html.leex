@@ -14,5 +14,5 @@
       <label><input value="Log10" type="radio" name="scale" phx-update="ignore">Log10</label>
     </form>
   </div>
-  <div id="chart" class="chart" data-quantile="<%= Jason.encode!(@quantile_data) %>" phx-hook="ChartData" phx-update="ignore"></div>
+  <div id="chart" class="chart" data-quantile="<%= Jason.encode!(@quantile_data) %>" data-scale="<%= Jason.encode!(@scale) %>" phx-hook="ChartData" phx-update="ignore"></div>
 </div>

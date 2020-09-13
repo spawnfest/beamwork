@@ -7,7 +7,6 @@ defmodule SpotlightWeb.PageLive do
     socket =
       socket
       |> assign(quantile_data: formatted_time_series("Linear"))
-      # |> assign(heatmap_data: formatted_time_series("Heatmap"))
       |> assign(:pause_action, "Pause")
       |> assign(:refresh_rate, 1000)
       |> assign(:scale, "Linear")
@@ -39,7 +38,7 @@ defmodule SpotlightWeb.PageLive do
       |> assign(:refresh_rate, val_int)
       |> assign(:scale, scale_val)
 
-    {:noreply, socket}
+    {:noreply, assign(socket, :quantile_data, formatted_time_series(socket.assigns.scale))}
   end
 
   @impl true
@@ -65,39 +64,6 @@ defmodule SpotlightWeb.PageLive do
     Process.send_after(self(), :tick, socket.assigns.refresh_rate)
   end
 
-  # defp formatted_time_series("Heatmap") do
-  #   data =
-  #     Spotlight.RequestTimeCollector.get_merged()
-  #     |> Map.new(fn {ts, ds} ->
-  #       points =
-  #         SimpleDog.to_list(ds)
-  #         |> Map.new(fn {val, count} ->
-  #           # convert from microseconds to milliseconds
-  #           {val / 1000, count}
-  #         end)
-
-  #       {ts, points}
-  #     end)
-
-  #   min_val = Enum.flat_map(data, fn {_ts, points} -> points end) |> Enum.min()
-  #   max_val = Enum.flat_map(data, fn {_ts, points} -> points end) |> Enum.max()
-
-  #   IO.inspect({min_val, max_val}, label: "min_max_val")
-  #   keys = Enum.map(data, fn {ts, _} -> ts end)
-  #   min_ts = Enum.min(keys, fn -> 0 end)
-  #   max_ts = Enum.max(keys, fn -> 0 end)
-
-  #   keys = Enum.map(min_ts..max_ts, fn x -> x end)
-
-  #   [
-  #     keys,
-  #     Enum.map(keys, fn ts ->
-  #       Map.get(data, ts)
-  #     end)
-  #   ]
-  #   |> IO.inspect(label: "heatmap data")
-  # end
-
   defp formatted_time_series("Linear") do
     data = Spotlight.RequestTimeCollector.get_merged()
     keys = Enum.map(data, fn {ts, _} -> ts end)
@@ -109,16 +75,13 @@ defmodule SpotlightWeb.PageLive do
     [
       keys,
       Enum.map(keys, fn ts ->
-        val = Map.get(data, ts, SimpleDog.new()) |> SimpleDog.quantile(0.99) |> ceil()
-        val / 1000
+        get_quantile(data, ts, 0.99)
       end),
       Enum.map(keys, fn ts ->
-        val = Map.get(data, ts, SimpleDog.new()) |> SimpleDog.quantile(0.90) |> ceil()
-        val / 1000
+        get_quantile(data, ts, 0.90)
       end),
       Enum.map(keys, fn ts ->
-        val = Map.get(data, ts, SimpleDog.new()) |> SimpleDog.quantile(0.50) |> ceil()
-        val / 1000
+        get_quantile(data, ts, 0.50)
       end),
       Enum.map(keys, fn ts ->
         Map.get(data, ts, SimpleDog.new()) |> SimpleDog.count() |> ceil()
@@ -126,59 +89,44 @@ defmodule SpotlightWeb.PageLive do
     ]
   end
 
-  defp formatted_time_series("Log2") do
-    data = Spotlight.RequestTimeCollector.get_merged()
-    keys = Enum.map(data, fn {ts, _} -> ts end)
-    min_ts = Enum.min(keys, fn -> 0 end)
-    max_ts = Enum.max(keys, fn -> 0 end)
+  defp get_quantile(data, ts, quantile) do
+    Map.get(data, ts, nil)
+    |> case do
+      nil ->
+        nil
 
-    keys = Enum.map(min_ts..max_ts, fn x -> x end)
+      sd ->
+        val = SimpleDog.quantile(sd, quantile) |> ceil()
+        val / 1000
+    end
+  end
+
+  defp formatted_time_series("Log2") do
+    [keys, p99s, p90s, p50s, counts] = formatted_time_series("Linear")
 
     [
       keys,
-      Enum.map(keys, fn ts ->
-        val = Map.get(data, ts, SimpleDog.new()) |> SimpleDog.quantile(0.99) |> ceil()
-        :math.log2(val / 1000)
-      end),
-      Enum.map(keys, fn ts ->
-        val = Map.get(data, ts, SimpleDog.new()) |> SimpleDog.quantile(0.90) |> ceil()
-        :math.log2(val / 1000)
-      end),
-      Enum.map(keys, fn ts ->
-        val = Map.get(data, ts, SimpleDog.new()) |> SimpleDog.quantile(0.50) |> ceil()
-        :math.log2(val / 1000)
-      end),
-      Enum.map(keys, fn ts ->
-        Map.get(data, ts, SimpleDog.new()) |> SimpleDog.count() |> ceil()
-      end)
+      Enum.map(p99s, &safe_log2/1),
+      Enum.map(p90s, &safe_log2/1),
+      Enum.map(p50s, &safe_log2/1),
+      Enum.map(counts, &safe_log2/1)
     ]
   end
 
   defp formatted_time_series("Log10") do
-    data = Spotlight.RequestTimeCollector.get_merged()
-    keys = Enum.map(data, fn {ts, _} -> ts end)
-    min_ts = Enum.min(keys, fn -> 0 end)
-    max_ts = Enum.max(keys, fn -> 0 end)
-
-    keys = Enum.map(min_ts..max_ts, fn x -> x end)
+    [keys, p99s, p90s, p50s, counts] = formatted_time_series("Linear")
 
     [
       keys,
-      Enum.map(keys, fn ts ->
-        val = Map.get(data, ts, SimpleDog.new()) |> SimpleDog.quantile(0.99) |> ceil()
-        :math.log10(val / 1000)
-      end),
-      Enum.map(keys, fn ts ->
-        val = Map.get(data, ts, SimpleDog.new()) |> SimpleDog.quantile(0.90) |> ceil()
-        :math.log10(val / 1000)
-      end),
-      Enum.map(keys, fn ts ->
-        val = Map.get(data, ts, SimpleDog.new()) |> SimpleDog.quantile(0.50) |> ceil()
-        :math.log10(val / 1000)
-      end),
-      Enum.map(keys, fn ts ->
-        Map.get(data, ts, SimpleDog.new()) |> SimpleDog.count() |> ceil()
-      end)
+      Enum.map(p99s, &safe_log10/1),
+      Enum.map(p90s, &safe_log10/1),
+      Enum.map(p50s, &safe_log10/1),
+      Enum.map(counts, &safe_log10/1)
     ]
   end
+
+  defp safe_log10(x) when x == 0 or is_nil(x), do: nil
+  defp safe_log10(x), do: :math.log10(x)
+  defp safe_log2(x) when x == 0 or is_nil(x), do: nil
+  defp safe_log2(x), do: :math.log2(x)
 end
