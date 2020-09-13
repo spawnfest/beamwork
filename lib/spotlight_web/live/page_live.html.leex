@@ -1,5 +1,6 @@
 <div class="chart_container">
-  <div class="chart_parent" id="chart_parent">
+<div class="chart_parent" id="chart_parent">
+    <button phx-click="toggle_pause"><%= @pause_action %></button>
     <div id="chart" class="chart" data-quantile="<%= Jason.encode!(@quantile_data) %>" phx-hook="ChartData" phx-update="ignore"></div>
   </div>
 </div>

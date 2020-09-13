@@ -72,7 +72,7 @@ function create_chart(data) {
 				value: (self, rawValue) => rawValue.toFixed(3) + "ms",
 				fill: "rgb(155, 214, 206, 0.5 )",
 				paths: paths,
-        scale: "ms"
+				scale: "ms"
 			},
 			{
 				label: "P90",
@@ -80,37 +80,38 @@ function create_chart(data) {
 				value: (self, rawValue) => rawValue.toFixed(3) + "ms",
 				fill: "rgb(79, 169, 184, 0.5)",
 				paths: paths,
-        scale: "ms"
+				scale: "ms"
 			},
 			{
 				label: "P50",
 				stroke: "rgb(2, 88, 115)",
 				value: (self, rawValue) => rawValue.toFixed(3) + "ms",
 				fill: "rgb(2, 88, 115, 0.5)",
-        paths: paths,
-        scale: "ms"
-      },
+				paths: paths,
+				scale: "ms"
+			},
 			{
 				label: "Throughput",
-        stroke: "rgb(30, 30, 30)",
-        scale: "rpm"
+				ke: "rgb(30, 30, 30)",
+				value: (self, rawValue) => rawValue + "rpm",
+				scale: "rpm"
 			}
 		],
-    axes: [
-      {},
-      {
-        scale: "ms",
-        grid: {show: false}
-        // values: (u, vals, space) => vals.map(v => +v.toFixed(1) + "%"),
-      },
-      {
-        side: 1,
-        scale: "rpm",
-        // size: 60,
-        // values: (u, vals, space) => vals.map(v => +v.toFixed(2) + " MB"),
-        grid: {show: false},
-      },
-    ]
+		axes: [
+			{},
+			{
+				scale: "ms",
+				grid: { show: false }
+				// values: (u, vals, space) => vals.map(v => +v.toFixed(1) + "%"),
+			},
+			{
+				side: 1,
+				scale: "rpm",
+				// size: 60,
+				// values: (u, vals, space) => vals.map(v => +v.toFixed(2) + " MB"),
+				grid: { show: false },
+			},
+		]
 	};
 
 	chart = new uPlot(opts, data, document.getElementById("chart"));

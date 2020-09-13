@@ -6,14 +6,44 @@ defmodule SpotlightWeb.PageLive do
   def mount(_params, _session, socket) do
     schedule_tick()
 
-    {:ok, assign(socket, quantile_data: formatted_time_series())}
+    socket =
+      socket
+      |> assign(quantile_data: formatted_time_series())
+      |> assign(:pause_action, "Pause")
+
+    {:ok, socket}
+  end
+
+  @impl true
+  def handle_event("toggle_pause", _value, socket) do
+    new_state =
+      if is_paused?(socket) do
+        schedule_tick()
+        "Pause"
+      else
+        "Resume"
+      end
+
+    {:noreply, assign(socket, :pause_action, new_state)}
   end
 
   @impl true
   def handle_info(:tick, socket) do
-    schedule_tick()
+    unless is_paused?(socket) do
+      schedule_tick()
+    end
 
     {:noreply, assign(socket, :quantile_data, formatted_time_series())}
+  end
+
+  defp is_paused?(socket) do
+    case socket.assigns.pause_action do
+      "Pause" ->
+        false
+
+      "Resume" ->
+        true
+    end
   end
 
   defp schedule_tick() do
