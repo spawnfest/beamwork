@@ -17,26 +17,20 @@ defmodule SpotlightWeb.PageLive do
   end
 
   @impl true
-  def handle_event("toggle_pause", _value, socket) do
-    new_state =
-      if is_paused?(socket) do
-        schedule_tick(socket)
-        "Pause"
-      else
-        "Resume"
+  def handle_event("controls_changed", %{"rate" => rate_val, "scale" => scale_val}, socket) do
+    socket =
+      case rate_val do
+        "Paused" ->
+          assign(socket, :refresh_rate, "Paused")
+
+        str_int ->
+          {refresh_rate, _} = Integer.parse(str_int)
+          new_socket = assign(socket, :refresh_rate, refresh_rate)
+          if socket.assigns.refresh_rate == "Paused", do: schedule_tick(new_socket)
+          new_socket
       end
 
-    {:noreply, assign(socket, :pause_action, new_state)}
-  end
-
-  @impl true
-  def handle_event("controls_changed", %{"rate" => rate_val, "scale" => scale_val}, socket) do
-    {val_int, _} = Integer.parse(rate_val)
-
-    socket =
-      socket
-      |> assign(:refresh_rate, val_int)
-      |> assign(:scale, scale_val)
+    socket = assign(socket, :scale, scale_val)
 
     {:noreply, assign(socket, :quantile_data, formatted_time_series(socket.assigns.scale))}
   end
@@ -51,12 +45,9 @@ defmodule SpotlightWeb.PageLive do
   end
 
   defp is_paused?(socket) do
-    case socket.assigns.pause_action do
-      "Pause" ->
-        false
-
-      "Resume" ->
-        true
+    case socket.assigns.refresh_rate do
+      "Paused" -> true
+      _ -> false
     end
   end
 

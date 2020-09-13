@@ -7,11 +7,12 @@
         <option value=5000>5 sec</option>
         <option value=10000>10 sec</option>
         <option value=30000>30 sec</option>
+        <option value="Paused">Paused</option>
       </select>
-      <button phx-click="toggle_pause"><%= @pause_action %></button>
-      <label><input value="Linear" type="radio" name="scale" checked="<%= @scale == "Linear" %>" phx-update="ignore">Linear</label>
-      <label><input value="Log2" type="radio" name="scale" phx-update="ignore">Log2</label>
-      <label><input value="Log10" type="radio" name="scale" phx-update="ignore">Log10</label>
+      <select name="scale" id="scale_selected" phx-update="ignore">
+        <option value="Linear">Linear Scale</option>
+        <option value="Log10">Log Scale</option>
+      </select>
     </form>
   </div>
   <div id="chart" class="chart" data-quantile="<%= Jason.encode!(@quantile_data) %>" data-scale="<%= Jason.encode!(@scale) %>" phx-hook="ChartData" phx-update="ignore"></div>

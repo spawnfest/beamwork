@@ -135,3 +135,7 @@ header {
 
   margin: 5px auto;
 }
+
+.controls > * + * {
+  margin-left: 5px;
+}
