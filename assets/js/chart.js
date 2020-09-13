@@ -4,7 +4,7 @@ let chart = null;
 
 function create_chart(data) {
 	//let rect = (document.getElementById("chart_parent").getBoundingClientRect());
-	let rect = { width: document.documentElement.clientWidth * 0.6, height: 400 };
+	let rect = { width: window.innerWidth * 0.6, height: 400 };
 
 	const paths = (u, sidx, i0, i1) => {
 		const s = u.series[sidx];
@@ -22,19 +22,17 @@ function create_chart(data) {
 			Math.round(u.valToPos(ydata[0], scaleY, true))
 		);
 
-		for (let i = i0; i <= i1 - 1; i++) {
+		for (let i = i0; i < i1; i++) {
 			let x0 = Math.round(u.valToPos(xdata[i], scaleX, true));
 			let y0 = Math.round(u.valToPos(ydata[i], scaleY, true));
 			let x1 = Math.round(u.valToPos(xdata[i + 1], scaleX, true));
 			let y1 = Math.round(u.valToPos(ydata[i + 1], scaleY, true));
 
-			x0 = x0 - x_width;
-			x1 = x1 - x_width;
-
-			stroke.lineTo(x0, y0);
-			stroke.lineTo(x1, y0);
+			stroke.lineTo(x0 - x_width, y0);
+			stroke.lineTo(x1 - x_width, y0);
 
 			if (i == i1 - 1) {
+				stroke.lineTo(x1 - x_width, y1);
 				stroke.lineTo(x1, y1);
 			}
 
@@ -73,23 +71,46 @@ function create_chart(data) {
 				stroke: "rgb(155, 214, 206)",
 				value: (self, rawValue) => rawValue.toFixed(3) + "ms",
 				fill: "rgb(155, 214, 206, 0.5 )",
-				paths: paths
+				paths: paths,
+        scale: "ms"
 			},
 			{
 				label: "P90",
 				stroke: "rgb(79, 169, 184)",
 				value: (self, rawValue) => rawValue.toFixed(3) + "ms",
 				fill: "rgb(79, 169, 184, 0.5)",
-				paths: paths
+				paths: paths,
+        scale: "ms"
 			},
 			{
 				label: "P50",
 				stroke: "rgb(2, 88, 115)",
 				value: (self, rawValue) => rawValue.toFixed(3) + "ms",
 				fill: "rgb(2, 88, 115, 0.5)",
-				paths: paths
+        paths: paths,
+        scale: "ms"
+      },
+			{
+				label: "Throughput",
+        stroke: "rgb(30, 30, 30)",
+        scale: "rpm"
 			}
 		],
+    axes: [
+      {},
+      {
+        scale: "ms",
+        grid: {show: false}
+        // values: (u, vals, space) => vals.map(v => +v.toFixed(1) + "%"),
+      },
+      {
+        side: 1,
+        scale: "rpm",
+        // size: 60,
+        // values: (u, vals, space) => vals.map(v => +v.toFixed(2) + " MB"),
+        grid: {show: false},
+      },
+    ]
 	};
 
 	chart = new uPlot(opts, data, document.getElementById("chart"));

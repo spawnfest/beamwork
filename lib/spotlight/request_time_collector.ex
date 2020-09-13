@@ -24,7 +24,7 @@ defmodule Spotlight.RequestTimeCollector do
     )
   end
 
-  @seconds_to_keep 500
+  @seconds_to_keep 600
   @max_error 0.04
 
   def handle_info({:duration, duration, mono_time, time_offset}, state) do

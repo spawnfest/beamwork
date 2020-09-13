@@ -5,11 +5,14 @@ defmodule SpotlightWeb.PageLive do
   @impl true
   def mount(_params, _session, socket) do
     schedule_tick()
+
     {:ok, assign(socket, quantile_data: formatted_time_series())}
   end
 
+  @impl true
   def handle_info(:tick, socket) do
     schedule_tick()
+
     {:noreply, assign(socket, :quantile_data, formatted_time_series())}
   end
 
@@ -38,6 +41,9 @@ defmodule SpotlightWeb.PageLive do
       Enum.map(keys, fn ts ->
         val = Map.get(data, ts, SimpleDog.new()) |> SimpleDog.quantile(0.50) |> ceil()
         val / 1000
+      end),
+      Enum.map(keys, fn ts ->
+        Map.get(data, ts, SimpleDog.new()) |> SimpleDog.count() |> ceil()
       end)
     ]
   end

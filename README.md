@@ -1,19 +1,5 @@
 # Spotlight
 
-To start your Phoenix server:
+A telemetry aggregator and dashboard that allows you to store and view percentile statistics (P50, P90, P99) for your web server's response time on the fly, directly on your nodes! 
 
-  * Install dependencies with `mix deps.get`
-  * Install Node.js dependencies with `npm install` inside the `assets` directory
-  * Start Phoenix endpoint with `mix phx.server`
-
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
-
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
-
-## Learn more
-
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+For more information on the underlying data structure that this project uses, see [dog_sketch](https://github.com/moosecodebv/dog_sketch).
