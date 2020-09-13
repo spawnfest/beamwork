@@ -1,6 +1,6 @@
 <div class="chart_container">
-<div class="chart_parent" id="chart_parent">
-    <form phx-change="refresh_rate_change">
+  <div class="chart_parent" id="chart_parent">
+    <form class="controls" phx-change="controls_changed">
       <select name="rate" id="refresh_rate_selected"  phx-update="ignore">
         <option value=1000>1 sec</option>
         <option value=2000>2 sec</option>
@@ -9,7 +9,10 @@
         <option value=30000>30 sec</option>
       </select>
       <button phx-click="toggle_pause"><%= @pause_action %></button>
+      <label><input value="Linear" type="radio" name="scale" checked="<%= @scale == "Linear" %>" phx-update="ignore">Linear</label>
+      <label><input value="Log2" type="radio" name="scale" phx-update="ignore">Log2</label>
+      <label><input value="Log10" type="radio" name="scale" phx-update="ignore">Log10</label>
     </form>
-    <div id="chart" class="chart" data-quantile="<%= Jason.encode!(@quantile_data) %>" phx-hook="ChartData" phx-update="ignore"></div>
   </div>
+  <div id="chart" class="chart" data-quantile="<%= Jason.encode!(@quantile_data) %>" phx-hook="ChartData" phx-update="ignore"></div>
 </div>

@@ -127,3 +127,11 @@ header {
   width: 100%;
   margin: 0 auto;
 }
+
+.controls {
+  display: flex; /* or inline-flex */
+  flex-direction: row;
+  vertical-align: middle;
+  
+  margin: 5px auto;
+}
