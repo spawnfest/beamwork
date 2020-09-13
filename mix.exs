@@ -54,6 +54,7 @@ defmodule Spotlight.MixProject do
     [
       description: "Low-overhead Phoenix Performance Graphs",
       licenses: ["MIT"],
+      links: %{},
       maintainers: ["Derek Kraan", "Sanne Kalkman", "Will Rogers"]
     ]
   end
