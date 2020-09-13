@@ -80,18 +80,6 @@ defmodule SpotlightWeb.PageLive do
     ]
   end
 
-  defp get_quantile(data, ts, quantile) do
-    Map.get(data, ts, nil)
-    |> case do
-      nil ->
-        nil
-
-      sd ->
-        val = SimpleDog.quantile(sd, quantile) |> ceil()
-        val / 1000
-    end
-  end
-
   defp formatted_time_series("Log2") do
     [keys, p99s, p90s, p50s, counts] = formatted_time_series("Linear")
 
@@ -114,6 +102,18 @@ defmodule SpotlightWeb.PageLive do
       Enum.map(p50s, &safe_log10/1),
       Enum.map(counts, &safe_log10/1)
     ]
+  end
+
+  defp get_quantile(data, ts, quantile) do
+    Map.get(data, ts, nil)
+    |> case do
+      nil ->
+        nil
+
+      sd ->
+        val = SimpleDog.quantile(sd, quantile) |> ceil()
+        val / 1000
+    end
   end
 
   defp safe_log10(x) when x == 0 or is_nil(x), do: nil
