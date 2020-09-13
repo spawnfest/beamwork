@@ -1,35 +1,4 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <%= csrf_meta_tag() %>
-    <%= live_title_tag assigns[:page_title] || "Spotlight", suffix: " · Phoenix Framework" %>
-    <link phx-track-static rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
-    <script defer phx-track-static type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
-  </head>
-  <body>
-    <header>
-      <section class="container">
-        <nav role="navigation">
-          <ul>
-          </ul>
-        </nav>
-
-        <svg id="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 247.96 71.96">
-          <path fill="#9BD6CE" d="M62.97 8.05l4.56 38.92 38.74-7.13L76.1 1.81 62.97 8.05z"/>
-          <circle cx="71.02" cy="8.05" r="8.05" fill="#f1f2f2"/>
-          <ellipse cx="88.62" cy="46.97" rx="21.09" ry="13.03" fill="#f1f2f2"/>
-          <text transform="translate(0 59.17)" font-size="60" fill="#f1f2f2" font-family="Lato-Regular, Lato">
-            Sp
-          </text>
-          <text transform="translate(108.46 60.98)" font-size="60" fill="#f1f2f2" font-family="Lato-Regular, Lato">
-            tlight
-          </text>
-        </svg>
-      </section>
-    </header>
-    <%= @inner_content %>
-  </body>
+  <%= @inner_content %>
 </html>

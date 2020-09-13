@@ -9,12 +9,18 @@ defmodule Spotlight.RequestTimeCollector do
   end
 
   def start_link() do
-    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-  def init(nil) do
+  @seconds_to_keep 600
+  @max_error 0.04
+
+  def init(config) do
+    seconds_to_keep = Keyword.get(config, :seconds_to_keep, @seconds_to_keep)
+    max_error = Keyword.get(config, :max_error, @max_error)
+
     :telemetry.attach(__MODULE__, [:phoenix, :endpoint, :stop], &handle_metrics/4, nil)
-    {:ok, %{keys: [], value_map: %{}}}
+    {:ok, %{keys: [], value_map: %{}, seconds_to_keep: seconds_to_keep, max_error: max_error}}
   end
 
   def handle_metrics([:phoenix, :endpoint, :stop], %{duration: duration}, _metadata, _config) do
@@ -24,11 +30,9 @@ defmodule Spotlight.RequestTimeCollector do
     )
   end
 
-  @seconds_to_keep 600
-  @max_error 0.04
-
   def handle_info({:duration, duration, mono_time, time_offset}, state) do
     converted_duration_us = System.convert_time_unit(duration, :native, :microsecond)
+    seconds_to_keep = state.seconds_to_keep
 
     new_state =
       case state.keys do
@@ -43,27 +47,29 @@ defmodule Spotlight.RequestTimeCollector do
 
         keys ->
           sdog =
-            SimpleDog.new(error: @max_error)
+            SimpleDog.new(error: state.max_error)
             |> SimpleDog.insert(converted_duration_us)
 
           new_state = %{
-            keys: [mono_time | keys],
-            value_map:
-              Map.put(
-                state.value_map,
-                mono_time,
-                {sdog, mono_time + time_offset}
-              )
+            state
+            | keys: [mono_time | keys],
+              value_map:
+                Map.put(
+                  state.value_map,
+                  mono_time,
+                  {sdog, mono_time + time_offset}
+                )
           }
 
           new_keys =
             new_state.keys
             |> Enum.filter(fn
-              key when key > mono_time - @seconds_to_keep -> true
+              key when key > mono_time - seconds_to_keep -> true
               _ -> false
             end)
 
           new_state = Map.put(new_state, :keys, new_keys)
+
           Map.put(new_state, :value_map, Map.take(new_state.value_map, new_state.keys))
       end
 

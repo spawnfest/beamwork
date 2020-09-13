@@ -35,7 +35,6 @@ function create_chart(data) {
 				stroke.lineTo(x1 - x_width, y1);
 				stroke.lineTo(x1, y1);
 			}
-
 		}
 
 		const fill = new Path2D(stroke);

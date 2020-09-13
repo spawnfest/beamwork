@@ -4,12 +4,13 @@ defmodule SpotlightWeb.PageLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    schedule_tick()
-
     socket =
       socket
       |> assign(quantile_data: formatted_time_series())
       |> assign(:pause_action, "Pause")
+      |> assign(:refresh_rate, 1000)
+
+    schedule_tick(socket)
 
     {:ok, socket}
   end
@@ -18,7 +19,7 @@ defmodule SpotlightWeb.PageLive do
   def handle_event("toggle_pause", _value, socket) do
     new_state =
       if is_paused?(socket) do
-        schedule_tick()
+        schedule_tick(socket)
         "Pause"
       else
         "Resume"
@@ -28,9 +29,15 @@ defmodule SpotlightWeb.PageLive do
   end
 
   @impl true
+  def handle_event("refresh_rate_change", %{"rate" => val}, socket) do
+    {val_int, _} = Integer.parse(val)
+    {:noreply, assign(socket, :refresh_rate, val_int)}
+  end
+
+  @impl true
   def handle_info(:tick, socket) do
     unless is_paused?(socket) do
-      schedule_tick()
+      schedule_tick(socket)
     end
 
     {:noreply, assign(socket, :quantile_data, formatted_time_series())}
@@ -46,8 +53,8 @@ defmodule SpotlightWeb.PageLive do
     end
   end
 
-  defp schedule_tick() do
-    Process.send_after(self(), :tick, 1000)
+  defp schedule_tick(socket) do
+    Process.send_after(self(), :tick, socket.assigns.refresh_rate)
   end
 
   defp formatted_time_series() do
