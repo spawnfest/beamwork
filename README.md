@@ -8,11 +8,15 @@
 
 # Phoenix Web Response Time Graphs
 
-✅ Very very low overhead (powered by [DogSketch](https://github.com/moosecodebv/dog_sketch))
-✅ Cluster-wide performance charts (not just a single node!)
-✅ No external dependencies (runs 100% in-BEAM)
-✅ Accurate p50, p90, p99 and throughput
-✅ Linear and Log scale
+:heavy_check_mark: Very very low overhead (powered by [DogSketch](https://github.com/moosecodebv/dog_sketch))
+
+:heavy_check_mark: Cluster-wide performance charts (not just a single node!)
+
+:heavy_check_mark: No external dependencies (runs 100% in-BEAM)
+
+:heavy_check_mark: Accurate p50, p90, p99 and throughput
+
+:heavy_check_mark: Linear and Log scale
 
 # Installation
 
