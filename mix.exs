@@ -4,6 +4,8 @@ defmodule Spotlight.MixProject do
   def project do
     [
       app: :spotlight,
+      name: "Spotlight",
+      package: package(),
       version: "0.1.0",
       elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -43,7 +45,16 @@ defmodule Spotlight.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:dog_sketch, "~> 0.1.2"}
+      {:dog_sketch, "~> 0.1.2"},
+      {:ex_doc, "~> 0.22.2", only: :dev, runtime: false}
+    ]
+  end
+
+  defp package do
+    [
+      description: "Low-overhead Phoenix Performance Graphs",
+      licenses: ["MIT"],
+      maintainers: ["Derek Kraan", "Sanne Kalkman", "Will Rogers"]
     ]
   end
 
